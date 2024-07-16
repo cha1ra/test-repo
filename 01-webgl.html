@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <canvas id="myCanvas"></canvas>
+    <script>
+        var canvas = document.getElementById('myCanvas');
+        var gl = canvas.getContext('webgl');
+
+        // 頂点シェーダーとフラグメントシェーダーのコード
+        var vertCode = 'attribute vec2 coordinates;' +
+            'void main(void) {' + ' gl_Position = vec4(coordinates, 0.0, 1.0);' + '}';
+        var fragCode = 'void main(void) {' + 'gl_FragColor = vec4(0, 0.5, 0, 1);' + '}';
+
+        // シェーダーの作成
+        var vertShader = gl.createShader(gl.VERTEX_SHADER);
+        var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
+        gl.shaderSource(vertShader, vertCode);
+        gl.shaderSource(fragShader, fragCode);
+        gl.compileShader(vertShader);
+        gl.compileShader(fragShader);
+
+        // シェーダープログラムの作成
+        var shaderProgram = gl.createProgram();
+        gl.attachShader(shaderProgram, vertShader);
+        gl.attachShader(shaderProgram, fragShader);
+        gl.linkProgram(shaderProgram);
+        gl.useProgram(shaderProgram);
+
+        // 長方形の頂点データ
+        var vertices = [-0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, 0.5];
+
+        // バッファの作成とバインド
+        var vertex_buffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+        // 頂点属性の設定
+        var coord = gl.getAttribLocation(shaderProgram, "coordinates");
+        gl.vertexAttribPointer(coord, 2, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(coord);
+
+        // 背景をクリア
+        gl.clearColor(0.5, 0.5, 0.5, 0.9);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        // 長方形の描画
+        gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+    </script>
+</body>
+
+</html>
